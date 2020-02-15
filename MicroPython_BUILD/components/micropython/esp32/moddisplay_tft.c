@@ -48,6 +48,12 @@
 #include "machine_hw_spi.h"
 #include "modmachine.h"
 
+STATIC mp_obj_t display_tft_get_send_data_funcptr()
+{
+    return MP_OBJ_NEW_SMALL_INT(&send_data);
+}
+MP_DEFINE_CONST_FUN_OBJ_0(display_tft_get_send_data_funcptr_obj, display_tft_get_send_data_funcptr);
+
 extern uint8_t disp_used_spi_host;
 
 typedef struct _display_tft_obj_t {
@@ -70,7 +76,7 @@ static const char* const display_types[] = {
     "ST7789V",
     "ST7735",
     "ST7735R",
-    "ST7735R144G",
+    "ST7735R_GREENTAB3",
     "ST7735B",
     "M5STACK",
     "Unknown",
@@ -275,7 +281,7 @@ STATIC mp_obj_t display_tft_init(mp_uint_t n_args, const mp_obj_t *pos_args, mp_
         if ((self->dconfig.type == DISP_TYPE_ST7789V) ||
                 (self->dconfig.type == DISP_TYPE_ST7735) ||
                 (self->dconfig.type == DISP_TYPE_ST7735R) ||
-                (self->dconfig.type == DISP_TYPE_ST7735R144G) ||
+                (self->dconfig.type == DISP_TYPE_ST7735_GREENTAB3) ||
                 (self->dconfig.type == DISP_TYPE_ST7735B)) self->dconfig.invrot = 1;
         else if (self->dconfig.type == DISP_TYPE_M5STACK) self->dconfig.invrot = 3;
         else self->dconfig.invrot = 0;
@@ -336,11 +342,11 @@ STATIC mp_obj_t display_tft_init(mp_uint_t n_args, const mp_obj_t *pos_args, mp_
     if (args[ARG_splash].u_bool) {
         int fhight = TFT_getfontheight();
         _fg = intToColor(iTFT_RED);
-        TFT_print("MicroPython", CENTER, (_height/2) - fhight - (fhight/2));
+        TFT_print("__badgy__", CENTER, (_height/2) - fhight - (fhight/2));
         _fg = intToColor(iTFT_GREEN);
-        TFT_print("MicroPython", CENTER, (_height/2) - (fhight/2));
+        TFT_print("__badgy__", CENTER, (_height/2) - (fhight/2));
         _fg = intToColor(iTFT_BLUE);
-        TFT_print("MicroPython", CENTER, (_height/2) + (fhight/2));
+        TFT_print("__badgy__", CENTER, (_height/2) + (fhight/2));
         _fg = intToColor(iTFT_GREEN);
     }
 
@@ -1586,6 +1592,48 @@ STATIC mp_obj_t display_tft_get_Y(mp_obj_t self_in)
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_1(display_tft_get_Y_obj, display_tft_get_Y);
 
+STATIC mp_obj_t display_tft_send_data(size_t n_args, const mp_obj_t *pos_args, mp_map_t *kw_args
+)
+
+{
+  int x1, y1, x2, y2;
+  uint32_t len;
+  uint8_t wait;
+
+  const mp_arg_t allowed_args[] = {
+      { MP_QSTR_x1, MP_ARG_REQUIRED | MP_ARG_INT, { .u_int = 0 } },
+      { MP_QSTR_y1, MP_ARG_REQUIRED | MP_ARG_INT, { .u_int = 0 } },
+      { MP_QSTR_x2, MP_ARG_REQUIRED | MP_ARG_INT, { .u_int = 0 } },
+      { MP_QSTR_y2, MP_ARG_REQUIRED | MP_ARG_INT, { .u_int = 0 } },
+      { MP_QSTR_len, MP_ARG_REQUIRED | MP_ARG_INT, { .u_int = 0 } },
+      { MP_QSTR_buffer, MP_ARG_OBJ, { .u_obj = mp_const_none } },
+      { MP_QSTR_wait, MP_ARG_REQUIRED | MP_ARG_BOOL, { .u_int = 0 } },
+  };
+
+  // parse positional args
+  mp_arg_val_t args[MP_ARRAY_SIZE(allowed_args)];
+  mp_arg_parse_all(n_args, pos_args, kw_args, MP_ARRAY_SIZE(allowed_args), allowed_args, args);
+
+  x1 = args[0].u_int;
+  y1 = args[1].u_int;
+  x2 = args[2].u_int;
+  y2 = args[3].u_int;
+  len = args[4].u_int;
+
+  mp_buffer_info_t bufinfo;
+  mp_get_buffer_raise(args[5].u_obj, &bufinfo, MP_BUFFER_READ);
+  if (bufinfo.len != len * sizeof(color_t))
+    mp_raise_ValueError("buffer length != length parameter");
+
+  wait = args[6].u_bool;
+
+  send_data(x1, y1, x2, y2, len, (color_t *)bufinfo.buf, wait);
+
+  return mp_const_none;
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_KW(display_tft_send_data_obj, 0, display_tft_send_data);
+
+
 
 //================================================================
 STATIC const mp_rom_map_elem_t display_tft_locals_dict_table[] = {
@@ -1641,13 +1689,16 @@ STATIC const mp_rom_map_elem_t display_tft_locals_dict_table[] = {
     { MP_ROM_QSTR(MP_QSTR_tft_writecmddata),    MP_ROM_PTR(&display_tft_send_cmd_data_obj) },
     { MP_ROM_QSTR(MP_QSTR_tft_readcmd),         MP_ROM_PTR(&display_tft_cmd_read_obj) },
 
+    { MP_ROM_QSTR(MP_QSTR_tft_get_send_data_funcptr),
+                                     MP_ROM_PTR(&display_tft_get_send_data_funcptr_obj) },
+
     // class constants
     { MP_ROM_QSTR(MP_QSTR_ST7789),              MP_ROM_INT(DISP_TYPE_ST7789V) },
     { MP_ROM_QSTR(MP_QSTR_ILI9341),             MP_ROM_INT(DISP_TYPE_ILI9341) },
     { MP_ROM_QSTR(MP_QSTR_ILI9488),             MP_ROM_INT(DISP_TYPE_ILI9488) },
     { MP_ROM_QSTR(MP_QSTR_ST7735),              MP_ROM_INT(DISP_TYPE_ST7735) },
     { MP_ROM_QSTR(MP_QSTR_ST7735R),             MP_ROM_INT(DISP_TYPE_ST7735R) },
-    { MP_ROM_QSTR(MP_QSTR_ST7735R144G),         MP_ROM_INT(DISP_TYPE_ST7735R144G) },
+    { MP_ROM_QSTR(MP_QSTR_ST7735_GREENTAB3),    MP_ROM_INT(DISP_TYPE_ST7735_GREENTAB3) },
     { MP_ROM_QSTR(MP_QSTR_ST7735B),             MP_ROM_INT(DISP_TYPE_ST7735B) },
     { MP_ROM_QSTR(MP_QSTR_M5STACK),             MP_ROM_INT(DISP_TYPE_M5STACK) },
     { MP_ROM_QSTR(MP_QSTR_GENERIC),             MP_ROM_INT(DISP_TYPE_GENERIC) },
@@ -1706,6 +1757,7 @@ STATIC const mp_rom_map_elem_t display_tft_locals_dict_table[] = {
     { MP_ROM_QSTR(MP_QSTR_TOUCH_NONE),          MP_ROM_INT(TOUCH_TYPE_NONE) },
     { MP_ROM_QSTR(MP_QSTR_TOUCH_XPT),           MP_ROM_INT(TOUCH_TYPE_XPT2046) },
     { MP_ROM_QSTR(MP_QSTR_TOUCH_STMPE),         MP_ROM_INT(TOUCH_TYPE_STMPE610) },
+    { MP_ROM_QSTR(MP_QSTR_send_data),           MP_ROM_PTR(&display_tft_send_data_obj) },
 };
 STATIC MP_DEFINE_CONST_DICT(display_tft_locals_dict, display_tft_locals_dict_table);
 

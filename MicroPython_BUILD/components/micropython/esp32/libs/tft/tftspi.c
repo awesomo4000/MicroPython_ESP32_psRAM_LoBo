@@ -71,6 +71,11 @@ uint8_t bits_per_color = 16;
 uint8_t TFT_RGB_BGR = 0;
 uint8_t gamma_curve = 0;
 uint32_t spi_speed = 10000000;
+
+// CGRAM_OFFSETS
+uint32_t cgram_rowstart = 0;
+uint32_t cgram_colstart = 0;
+
 // ====================================================
 
 static color_t *trans_cline = NULL;
@@ -211,6 +216,11 @@ static void disp_spi_transfer_addrwin(uint16_t x1, uint16_t x2, uint16_t y1, uin
 
 	disp_spi_transfer_cmd(TFT_CASET);
 
+#ifdef CGRAM_OFFSET
+    x1 += cgram_rowstart;
+    x2 += cgram_rowstart;
+#endif
+
 	wd = (uint32_t)(x1 >> 8);
 	wd |= (uint32_t)(x1 & 0xff) << 8;
 	wd |= (uint32_t)(x2 >> 8) << 16;
@@ -222,6 +232,11 @@ static void disp_spi_transfer_addrwin(uint16_t x1, uint16_t x2, uint16_t y1, uin
     _spi_transfer_start(disp_spi, 32, 0);
 
 	disp_spi_transfer_cmd(TFT_PASET);
+
+#ifdef CGRAM_OFFSET
+    y1 += cgram_colstart;
+    y2 += cgram_colstart;
+#endif
 
 	wd = (uint32_t)(y1 >> 8);
 	wd |= (uint32_t)(y1 & 0xff) << 8;
@@ -951,15 +966,31 @@ void _tft_setRotation(uint8_t rot) {
     else if (invertrot == 1) {
         switch (rotation) {
             case PORTRAIT:
+        #ifdef CGRAM_OFFSET
+            cgram_rowstart = CGRAM_PORTRAIT_ROWSTART;
+            cgram_colstart = CGRAM_PORTRAIT_COLSTART;
+        #endif
             madctl = (MADCTL_MY | MADCTL_MX | TFT_RGB_BGR);
             break;
             case LANDSCAPE:
+        #ifdef CGRAM_OFFSET
+            cgram_rowstart = CGRAM_LANDSCAPE_ROWSTART;
+            cgram_colstart = CGRAM_LANDSCAPE_COLSTART;
+        #endif
             madctl = (MADCTL_MY | MADCTL_MV | TFT_RGB_BGR);
             break;
             case PORTRAIT_FLIP:
+        #ifdef CGRAM_OFFSET
+            cgram_rowstart = CGRAM_PORTRAIT_FLIP_ROWSTART;
+            cgram_colstart = CGRAM_PORTRAIT_FLIP_COLSTART;
+        #endif
             madctl = (TFT_RGB_BGR);
             break;
             case LANDSCAPE_FLIP:
+        #ifdef CGRAM_OFFSET
+            cgram_rowstart = CGRAM_LANDSCAPE_FLIP_ROWSTART;
+            cgram_colstart = CGRAM_LANDSCAPE_FLIP_COLSTART;
+        #endif
             madctl = (MADCTL_MX | MADCTL_MV | TFT_RGB_BGR);
             break;
         }
@@ -1251,8 +1282,8 @@ esp_err_t TFT_display_init(display_config_t *dconfig)
         commandList(Rcmd2green);
         commandList(Rcmd3);
     }
-    else if (tft_disp_type == DISP_TYPE_ST7735R144G) {
-        //ESP_LOGW(TAG, "Display type DISP_TYPE_ST7735R144G.");
+    else if (tft_disp_type == DISP_TYPE_ST7735_GREENTAB3) {
+        ESP_LOGW(TAG, "Display type DISP_TYPE_ST7735_GREENTAB3.");
         commandList(STP7735R_init);
         commandList(Rcmd2green144);
         commandList(Rcmd3);

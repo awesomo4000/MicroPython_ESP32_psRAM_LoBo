@@ -33,6 +33,7 @@
 
 #include "py/obj.h"
 
+MP_DECLARE_CONST_FUN_OBJ_0(display_tft_get_send_data_funcptr_obj);
 MP_DECLARE_CONST_FUN_OBJ_KW(display_tft_drawPixel_obj);
 MP_DECLARE_CONST_FUN_OBJ_KW(display_tft_drawCircle_obj);
 MP_DECLARE_CONST_FUN_OBJ_KW(display_tft_drawLine_obj);

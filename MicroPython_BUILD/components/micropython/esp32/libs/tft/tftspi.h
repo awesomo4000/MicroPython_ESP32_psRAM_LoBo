@@ -86,8 +86,8 @@ typedef struct __attribute__((__packed__)) {
 #define TP_CALY_STMPE610	11800144
 
 // === Screen orientation constants ===
-#define PORTRAIT	0
-#define LANDSCAPE	1
+#define PORTRAIT	    0
+#define LANDSCAPE	    1
 #define PORTRAIT_FLIP	2
 #define LANDSCAPE_FLIP	3
 
@@ -96,7 +96,7 @@ typedef struct __attribute__((__packed__)) {
 #define DISP_TYPE_ST7789V     2
 #define DISP_TYPE_ST7735      3
 #define DISP_TYPE_ST7735R     4
-#define DISP_TYPE_ST7735R144G 5 // ST7735 1.44" GREEN TAB
+#define DISP_TYPE_ST7735_GREENTAB3 5 // ST7735 1.44" GREENTAB3
 #define DISP_TYPE_ST7735B     6
 #define DISP_TYPE_M5STACK     7
 #define DISP_TYPE_GENERIC     8
@@ -105,6 +105,18 @@ typedef struct __attribute__((__packed__)) {
 #define DEFAULT_TFT_DISPLAY_WIDTH  240
 #define DEFAULT_TFT_DISPLAY_HEIGHT 320
 #define DEFAULT_DISP_TYPE   DISP_TYPE_ILI9341
+
+#if defined (DISP_TYPE_ST7735_GREENTAB3)
+    #define CGRAM_OFFSET
+    #define CGRAM_PORTRAIT_ROWSTART        2
+    #define CGRAM_PORTRAIT_COLSTART        3
+    #define CGRAM_LANDSCAPE_ROWSTART       3
+    #define CGRAM_LANDSCAPE_COLSTART       2
+    #define CGRAM_PORTRAIT_FLIP_ROWSTART   2
+    #define CGRAM_PORTRAIT_FLIP_COLSTART   1
+    #define CGRAM_LANDSCAPE_FLIP_ROWSTART  1
+    #define CGRAM_LANDSCAPE_FLIP_COLSTART  2
+#endif
 
 /*
 #define WROVER_V3_CONFIG() {\
@@ -538,13 +550,13 @@ static const uint8_t Rcmd2green[] = {
 // Init for 7735R, part 2 (green tab, 1.44")
 // -----------------------------------------
 static const uint8_t Rcmd2green144[] = {
-  2,                        // 2 commands in list:
+  3 ,                       // 2 commands in list:
   TFT_CASET , 4 ,           // 1: Column addr set, 4 args, no delay:
     0x00, 0x00,             //    XSTART = 2
     0x00, 0x7F,             //    XEND   = 127
   TFT_PASET , 4 ,           // 2: Row addr set, 4 args, no delay:
     0x00, 0x00,             //    XSTART = 3
-    0x00, 0x7F,             //    XEND = 127 
+    0x00, 0x7F              //    XEND = 127 
 };
 
 // Init for 7735R, part 2 (red tab only)
