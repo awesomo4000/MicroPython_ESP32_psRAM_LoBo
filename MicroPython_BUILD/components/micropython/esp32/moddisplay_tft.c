@@ -342,11 +342,11 @@ STATIC mp_obj_t display_tft_init(mp_uint_t n_args, const mp_obj_t *pos_args, mp_
     if (args[ARG_splash].u_bool) {
         int fhight = TFT_getfontheight();
         _fg = intToColor(iTFT_RED);
-        TFT_print("__badgy__", CENTER, (_height/2) - fhight - (fhight/2));
+        TFT_print("MicroPython", CENTER, (_height/2) - fhight - (fhight/2));
         _fg = intToColor(iTFT_GREEN);
-        TFT_print("__badgy__", CENTER, (_height/2) - (fhight/2));
+        TFT_print("MicroPython", CENTER, (_height/2) - (fhight/2));
         _fg = intToColor(iTFT_BLUE);
-        TFT_print("__badgy__", CENTER, (_height/2) + (fhight/2));
+        TFT_print("MicroPython", CENTER, (_height/2) + (fhight/2));
         _fg = intToColor(iTFT_GREEN);
     }
 
