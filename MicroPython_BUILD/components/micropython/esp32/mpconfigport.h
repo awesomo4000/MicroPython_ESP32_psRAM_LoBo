@@ -303,6 +303,13 @@ extern const struct _mp_obj_module_t mp_module_ssh;
 #define BUILTIN_MODULE_SSH
 #endif
 
+#ifdef CONFIG_MICROPY_USE_IOT_TOUCHPAD
+extern const struct _mp_obj_module_t mp_module_iot_touchpad;
+#define BUILTIN_MODULE_IOT_TOUCHPAD { MP_OBJ_NEW_QSTR(MP_QSTR_iot_touchpad), (mp_obj_t)&mp_module_iot_touchpad },
+#else
+#define BUILTIN_MODULE_IOT_TOUCHPAD
+#endif
+
 #ifdef CONFIG_MICROPY_USE_DISPLAY
 extern const struct _mp_obj_module_t mp_module_display;
 #define BUILTIN_MODULE_DISPLAY { MP_OBJ_NEW_QSTR(MP_QSTR_display), (mp_obj_t)&mp_module_display },
@@ -346,6 +353,7 @@ extern const struct _mp_obj_module_t mp_module_bluetooth;
 	BUILTIN_MODULE_GSM \
 	BUILTIN_MODULE_OTA \
 	BUILTIN_MODULE_BLUETOOTH \
+    BUILTIN_MODULE_IOT_TOUCHPAD \
 
 #define MICROPY_PORT_BUILTIN_MODULE_WEAK_LINKS \
     { MP_OBJ_NEW_QSTR(MP_QSTR_binascii), (mp_obj_t)&mp_module_ubinascii }, \

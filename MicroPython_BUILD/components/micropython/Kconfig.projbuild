@@ -615,6 +615,14 @@ menu "MicroPython"
                 endchoice
 
         endmenu
+
+
+        config MICROPY_USE_IOT_TOUCHPAD
+            bool "Use esp-iot-solution touchpad driver module"
+            default n
+            help
+                Include esp-iot-solution touchpad driver
+
     endmenu
     menu "File systems"
         config MICROPY_FILESYSTEM_TYPE
