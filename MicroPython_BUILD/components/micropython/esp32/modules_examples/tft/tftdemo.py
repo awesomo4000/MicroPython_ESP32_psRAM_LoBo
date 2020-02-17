@@ -18,11 +18,15 @@ tft = display.TFT()
 #tft.init(tft.ILI9341, width=240, height=320, miso=19, mosi=18, clk=5, cs=15, dc=33, bgr=True, hastouch=tft.TOUCH_STMPE, tcs=32)
 
 # M5Stack:
-tft.init(tft.M5STACK, width=240, height=320, rst_pin=33, backl_pin=32, miso=19, mosi=23, clk=18, cs=14, dc=27, bgr=True, backl_on=1)
+#tft.init(tft.M5STACK, width=240, height=320, rst_pin=33, backl_pin=32, miso=19, mosi=23, clk=18, cs=14, dc=27, bgr=True, backl_on=1)
 
 # Some others...
 #tft.init(tft.ILI9341, width=240, height=320, miso=19,mosi=23,clk=18,cs=5,dc=26,tcs=27,hastouch=True, bgr=True)
 #tft.init(tft.ST7735R, speed=10000000, spihost=tft.HSPI, mosi=13, miso=12, clk=14, cs=15, dc=27, rst_pin=26, hastouch=False, bgr=False, width=128, height=160)
+
+tft.init(tft.ST7735_GREENTAB3,speed=26666666, spihost=tft.VSPI, splash=True,
+         mosi=23, miso=4, clk=18, cs=19, dc=26, rst_pin=25,
+         hastouch=False, bgr=True, width=128, height=128)
 
 
 def testt():
@@ -38,8 +42,8 @@ def testt():
         time.sleep_ms(50)
 
 
-maxx = 320
-maxy = 240
+maxx = 128
+maxy = 128
 miny = 12
 touch = False
 
@@ -339,10 +343,10 @@ def fullDemo(sec=5, rot=tft.LANDSCAPE):
 # Run demo in thread
 def dispDemo_th():
     while True:
-        fullDemo(rot=tft.LANDSCAPE)
         fullDemo(rot=tft.PORTRAIT)
-        fullDemo(rot=tft.LANDSCAPE_FLIP)
+        fullDemo(rot=tft.LANDSCAPE)
         fullDemo(rot=tft.PORTRAIT_FLIP)
+        fullDemo(rot=tft.LANDSCAPE_FLIP)
 
 # dispth=_thread.start_new_thread("TFTDemo", dispDemo_th, ())
 
