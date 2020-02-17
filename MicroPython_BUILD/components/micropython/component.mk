@@ -4,10 +4,26 @@
 # (Uses default behaviour of compiling all source files in directory, adding 'include' to include path.)
 
 
-COMPONENT_ADD_INCLUDEDIRS := .  genhdr py esp32 lib lib/utils lib/mp-readline extmod extmod/crypto-algorithms lib/netutils drivers/dht \
-							 lib/timeutils  lib/berkeley-db-1.xx/include lib/berkeley-db-1.xx/btree \
-							 lib/berkeley-db-1.xx/db lib/berkeley-db-1.xx/hash lib/berkeley-db-1.xx/man lib/berkeley-db-1.xx/mpool lib/berkeley-db-1.xx/recno \
-							 ../curl/include ../curl/lib ../zlib ../libssh2/include ../espmqtt/include ../espmqtt/lib/include ../littlefs
+COMPONENT_ADD_INCLUDEDIRS := .  genhdr py esp32 lib \
+								lib/utils lib/mp-readline extmod \
+								extmod/crypto-algorithms \
+								lib/netutils drivers/dht \
+								lib/timeutils  \
+								lib/berkeley-db-1.xx/include \
+								lib/berkeley-db-1.xx/btree \
+								lib/berkeley-db-1.xx/db \
+								lib/berkeley-db-1.xx/hash \
+								lib/berkeley-db-1.xx/man \
+								lib/berkeley-db-1.xx/mpool \
+								lib/berkeley-db-1.xx/recno \
+								../curl/include \
+								../curl/lib \
+								../zlib \
+								../libssh2/include \
+								../espmqtt/include \
+								../espmqtt/lib/include \
+								../littlefs \
+								lib/touchpad
 
 COMPONENT_PRIV_INCLUDEDIRS := .  genhdr py esp32 lib
 
@@ -102,6 +118,10 @@ MP_EXTRA_INC += -I$(ESPCOMP)/openssl/include
 MP_EXTRA_INC += -I$(ESPCOMP)/app_update/include
 MP_EXTRA_INC += -I$(ESPCOMP)/mdns/include
 MP_EXTRA_INC += -I$(ESPCOMP)/esp_https_ota/include
+
+ifdef CONFIG_MICROPY_USE_IOT_TOUCHPAD
+MP_EXTRA_INC += -I$(COMPONENT_PATH)/lib/touchpad
+endif
 
 ifdef CONFIG_MICROPY_USE_BLUETOOTH
 MP_EXTRA_INC += -I$(ESPCOMP)/bt/include
@@ -234,6 +254,10 @@ ifdef CONFIG_MICROPY_USE_RFCOMM
 SRC_C += esp32/machine_rfcomm.c
 endif
 
+ifdef CONFIG_MICROPY_USE_IOT_TOUCHPAD
+SRC_C += esp32/modiot_tp.c
+endif
+
 EXTMOD_SRC_C = $(addprefix extmod/,\
 	modbtree.c \
 	)
@@ -245,6 +269,7 @@ LIB_SRC_C = $(addprefix lib/,\
 	utils/pyexec.c \
 	utils/interrupt_char.c \
 	utils/sys_stdio_mphal.c \
+	touchpad/touchpad.c \
 	)
 
 LIBS_SRC_C = $(addprefix esp32/libs/,\
