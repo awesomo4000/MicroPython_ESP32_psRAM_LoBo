@@ -69,6 +69,13 @@ typedef enum tp_evt_t {
   TP_PUSH_10S     //  ""  ""    (10s)
 } tp_evt_t;
 
+// In case callback is a bound method
+typedef struct _mp_obj_bound_meth_t {
+    mp_obj_base_t base;
+    mp_obj_t meth;
+    mp_obj_t self;
+} mp_obj_bound_meth_t;
+
 //-----------------------------------------------------------------------------
 
 static mp_obj_t event_callback = NULL;
@@ -79,7 +86,7 @@ static void tp_cb_handler(void *arg, tp_evt_t evt_type)
     tp_handle_t tp_dev = (tp_handle_t) arg;
     touch_pad_t tp_num = iot_tp_num_get(tp_dev);
     //ESP_LOGI(TAG, "cb->tp=%d type=%d", tp_num, evt_type);
-
+    mp_obj_bound_meth_t *o = NULL;
     mp_sched_carg_t *carg = NULL;
 
     if (event_callback) {
@@ -95,7 +102,13 @@ static void tp_cb_handler(void *arg, tp_evt_t evt_type)
     }
 
     if (carg) {
-        mp_sched_schedule(event_callback, mp_const_none, carg);
+        if (MP_OBJ_IS_FUN(event_callback)) {
+            mp_sched_schedule(event_callback, mp_const_none, carg);
+        }
+        if (MP_OBJ_IS_METH(event_callback)) {
+            o = MP_OBJ_TO_PTR(event_callback);
+            mp_sched_schedule(event_callback, o->self , carg);
+        }
     }
 }
 
@@ -213,6 +226,13 @@ STATIC const mp_rom_map_elem_t iot_tp_globals_table[] = {
 { MP_ROM_QSTR(MP_QSTR_START)     , MP_ROM_INT(START)  },
 { MP_ROM_QSTR(MP_QSTR_A)         , MP_ROM_INT(A)      },
 { MP_ROM_QSTR(MP_QSTR_B)         , MP_ROM_INT(B)      },
+{ MP_ROM_QSTR(MP_QSTR_PUSH)      , MP_ROM_INT(TP_PUSH)     },
+{ MP_ROM_QSTR(MP_QSTR_RELEASE)   , MP_ROM_INT(TP_RELEASE ) },
+{ MP_ROM_QSTR(MP_QSTR_TAP)       , MP_ROM_INT(TP_TAP)      },
+{ MP_ROM_QSTR(MP_QSTR_PUSH_1S)   , MP_ROM_INT(TP_PUSH_1S)  },
+{ MP_ROM_QSTR(MP_QSTR_PUSH_3S)   , MP_ROM_INT(TP_PUSH_3S)  },
+{ MP_ROM_QSTR(MP_QSTR_PUSH_5S)   , MP_ROM_INT(TP_PUSH_5S)  },
+{ MP_ROM_QSTR(MP_QSTR_PUSH_10S)  , MP_ROM_INT(TP_PUSH_10S) },
 };
 STATIC MP_DEFINE_CONST_DICT(iot_tp_module_globals, iot_tp_globals_table);
 
