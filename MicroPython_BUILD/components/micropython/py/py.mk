@@ -197,7 +197,8 @@ PY_O_BASENAME = \
 	../lib/embed/abort_.o \
 	../extmod/vfs_native.o \
 	../extmod/vfs_native_file.o \
-	../extmod/vfs_native_misc.o
+	../extmod/vfs_native_misc.o \
+	../extmod/moducryptolib.o \
 
 # prepend the build destination prefix to the py object files
 PY_O = $(addprefix $(PY_BUILD)/, $(PY_O_BASENAME))

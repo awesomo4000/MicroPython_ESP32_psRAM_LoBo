@@ -623,6 +623,12 @@ menu "MicroPython"
             help
                 Include esp-iot-solution touchpad driver
 
+        config MICROPY_USE_UCRYPTOLIB
+            bool "Use ucryptolib module"
+            default y
+            help
+                Include ucryptolib module (from mainline micropython)
+
     endmenu
     menu "File systems"
         config MICROPY_FILESYSTEM_TYPE

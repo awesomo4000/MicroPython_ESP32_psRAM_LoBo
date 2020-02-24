@@ -234,6 +234,16 @@
 #endif
 */
 
+
+// ucryptolib
+#ifdef CONFIG_MICROPY_USE_UCRYPTOLIB
+#define MICROPY_PY_UCRYPTOLIB               (1)
+#define MICROPY_PY_UCRYPTOLIB_CTR           (1)
+#define MICROPY_PY_UCRYPTOLIB_CONSTS        (1)
+#else
+#define MICROPY_PY_UCRYPTOLIB               (0)
+#endif
+
 // fatfs configuration
 #if defined(CONFIG_FATFS_LFN_STACK)
 #define MICROPY_FATFS_ENABLE_LFN            (2)
@@ -372,6 +382,7 @@ extern const struct _mp_obj_module_t mp_module_bluetooth;
     { MP_OBJ_NEW_QSTR(MP_QSTR_struct), (mp_obj_t)&mp_module_ustruct }, \
     { MP_OBJ_NEW_QSTR(MP_QSTR_time), (mp_obj_t)&utime_module }, \
     { MP_OBJ_NEW_QSTR(MP_QSTR_zlib), (mp_obj_t)&mp_module_uzlib }, \
+    { MP_OBJ_NEW_QSTR(MP_QSTR_cryptolib), (mp_obj_t)&mp_module_ucryptolib }, \
 
 #define MP_STATE_PORT MP_STATE_VM
 
